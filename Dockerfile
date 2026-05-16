@@ -15,10 +15,19 @@ RUN pip install --no-cache-dir \
     transformers \
     sentence-transformers
 
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('BAAI/bge-base-en-v1.5')"
+# Save embedding model cleanly
+RUN python -c "\
+from sentence_transformers import SentenceTransformer; \
+model = SentenceTransformer('BAAI/bge-base-en-v1.5'); \
+model.save('/models/bge-base-en-v1.5')"
 
-RUN python -c "from sentence_transformers import CrossEncoder; CrossEncoder('BAAI/bge-reranker-base')"
+# Save reranker cleanly
+RUN python -c "\
+from sentence_transformers import CrossEncoder; \
+model = CrossEncoder('BAAI/bge-reranker-base'); \
+model.model.save_pretrained('/models/bge-reranker-base'); \
+model.tokenizer.save_pretrained('/models/bge-reranker-base')"
 
 RUN rm -rf /root/.cache/pip
 
-CMD ["bash"]
+CMD [\"bash\"]
